@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+    <defs>
+        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#3C2A21" />
+            <stop offset="50%" stop-color="#281A14" />
+            <stop offset="100%" stop-color="#190F0C" />
+        </linearGradient>
+        <linearGradient id="goldGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#A1553E" />
+            <stop offset="50%" stop-color="#D4A373" />
+            <stop offset="100%" stop-color="#F4EFE6" />
+        </linearGradient>
+        <linearGradient id="plumeGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#281A14" />
+            <stop offset="50%" stop-color="#A1553E" />
+            <stop offset="100%" stop-color="#E5BE9E" />
+        </linearGradient>
+        <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFFFFF" />
+            <stop offset="60%" stop-color="#FAF7F2" />
+            <stop offset="100%" stop-color="#E8DAC8" />
+        </linearGradient>
+        <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFFFF" />
+            <stop offset="50%" stop-color="#D4A373" />
+            <stop offset="100%" stop-color="#843B27" />
+        </radialGradient>
+        <radialGradient id="ambientGlow" cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stop-color="rgba(212, 163, 115, 0.25)" />
+            <stop offset="100%" stop-color="rgba(25, 15, 12, 0)" />
+        </radialGradient>
+        <filter id="glossShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.45" />
+        </filter>
+    </defs>
+
+    <rect width="512" height="512" rx="128" fill="url(#bgGrad)" filter="url(#glossShadow)" />
+    <rect width="510" height="510" x="1" y="1" rx="127" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="2" />
+    <circle cx="256" cy="230" r="190" fill="url(#ambientGlow)" />
+
+    <g transform="translate(0, 10)">
+        <path d="M 256 90 C 248 135 244 190 248 245 C 252 245 260 245 264 245 C 268 190 264 135 256 90 Z" fill="url(#plumeGrad)" opacity="0.95" />
+        <ellipse cx="256" cy="110" rx="14" ry="20" fill="url(#eyeGlow)" />
+        <circle cx="256" cy="110" r="6" fill="#190F0C" />
+        <circle cx="256" cy="110" r="2.5" fill="#FFFFFF" />
+
+        <g transform="rotate(-18 256 260)">
+            <path d="M 256 94 C 248 138 244 190 248 245 C 252 245 260 245 264 245 C 268 190 264 138 256 94 Z" fill="url(#plumeGrad)" opacity="0.9" />
+            <ellipse cx="256" cy="114" rx="13" ry="19" fill="url(#eyeGlow)" />
+            <circle cx="256" cy="114" r="5.5" fill="#190F0C" />
+            <circle cx="256" cy="114" r="2" fill="#FFFFFF" />
+        </g>
+        <g transform="rotate(18 256 260)">
+            <path d="M 256 94 C 248 138 244 190 248 245 C 252 245 260 245 264 245 C 268 190 264 138 256 94 Z" fill="url(#plumeGrad)" opacity="0.9" />
+            <ellipse cx="256" cy="114" rx="13" ry="19" fill="url(#eyeGlow)" />
+            <circle cx="256" cy="114" r="5.5" fill="#190F0C" />
+            <circle cx="256" cy="114" r="2" fill="#FFFFFF" />
+        </g>
+
+        <g transform="rotate(-36 256 260)">
+            <path d="M 256 102 C 248 144 244 192 248 245 C 252 245 260 245 264 245 C 268 192 264 144 256 102 Z" fill="url(#plumeGrad)" opacity="0.85" />
+            <ellipse cx="256" cy="122" rx="12" ry="18" fill="url(#eyeGlow)" />
+            <circle cx="256" cy="122" r="5" fill="#190F0C" />
+            <circle cx="256" cy="122" r="2" fill="#FFFFFF" />
+        </g>
+        <g transform="rotate(36 256 260)">
+            <path d="M 256 102 C 248 144 244 192 248 245 C 252 245 260 245 264 245 C 268 192 264 144 256 102 Z" fill="url(#plumeGrad)" opacity="0.85" />
+            <ellipse cx="256" cy="122" rx="12" ry="18" fill="url(#eyeGlow)" />
+            <circle cx="256" cy="122" r="5" fill="#190F0C" />
+            <circle cx="256" cy="122" r="2" fill="#FFFFFF" />
+        </g>
+
+        <g transform="rotate(-54 256 260)">
+            <path d="M 256 116 C 248 152 244 195 248 245 C 252 245 260 245 264 245 C 268 195 264 152 256 116 Z" fill="url(#plumeGrad)" opacity="0.75" />
+            <ellipse cx="256" cy="136" rx="11" ry="17" fill="url(#eyeGlow)" />
+            <circle cx="256" cy="136" r="4.5" fill="#190F0C" />
+            <circle cx="256" cy="136" r="1.5" fill="#FFFFFF" />
+        </g>
+        <g transform="rotate(54 256 260)">
+            <path d="M 256 116 C 248 152 244 195 248 245 C 252 245 260 245 264 245 C 268 195 264 152 256 116 Z" fill="url(#plumeGrad)" opacity="0.75" />
+            <ellipse cx="256" cy="136" rx="11" ry="17" fill="url(#eyeGlow)" />
+            <circle cx="256" cy="136" r="4.5" fill="#190F0C" />
+            <circle cx="256" cy="136" r="1.5" fill="#FFFFFF" />
+        </g>
+
+        <path d="M 126 310 C 126 175 184 125 256 125 C 328 125 386 175 386 310" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 10" opacity="0.6" />
+        <path d="M 148 310 C 148 200 196 155 256 155 C 316 155 364 200 364 310" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round" />
+
+        <path d="M 170 380 L 170 340 C 170 292 208 254 256 254 C 304 254 342 292 342 340 L 342 380 Z" fill="rgba(39, 26, 20, 0.75)" stroke="url(#goldGrad)" stroke-width="2.5" />
+
+        <g>
+            <line x1="256" y1="188" x2="256" y2="168" stroke="#D4A373" stroke-width="2" stroke-linecap="round" />
+            <circle cx="256" cy="166" r="4" fill="#F4EFE6" />
+
+            <line x1="254" y1="189" x2="244" y2="171" stroke="#D4A373" stroke-width="2" stroke-linecap="round" />
+            <circle cx="242" cy="169" r="3.5" fill="#D4A373" />
+
+            <line x1="258" y1="189" x2="268" y2="171" stroke="#D4A373" stroke-width="2" stroke-linecap="round" />
+            <circle cx="270" cy="169" r="3.5" fill="#D4A373" />
+
+            <path d="M 256 186 C 248 186 242 192 242 200 C 242 208 247 214 252 217 C 248 226 246 238 246 252 C 246 278 252 298 256 322 C 260 298 266 278 266 252 C 266 238 264 226 260 217 C 265 214 270 208 270 200 C 270 192 264 186 256 186 Z" fill="url(#bodyGrad)" filter="url(#glossShadow)" />
+
+            <circle cx="253" cy="198" r="1.8" fill="#281A14" />
+            <circle cx="259" cy="198" r="1.8" fill="#281A14" />
+
+            <path d="M 256 202 L 253 207 L 259 207 Z" fill="#A1553E" />
+
+            <circle cx="256" cy="254" r="14" fill="none" stroke="#A1553E" stroke-width="2.5" />
+            <circle cx="256" cy="254" r="6" fill="#A1553E" />
+            <circle cx="256" cy="254" r="2" fill="#FFFFFF" />
+
+            <path d="M 248 290 L 264 290 M 251 298 L 261 298 M 253 306 L 259 306" stroke="#A1553E" stroke-width="2" stroke-linecap="round" opacity="0.8" />
+        </g>
+
+        <rect x="145" y="380" width="222" height="12" rx="6" fill="url(#goldGrad)" />
+        <rect x="175" y="396" width="162" height="6" rx="3" fill="#D4A373" opacity="0.6" />
+
+        <g transform="translate(196, 420)">
+            <text x="60" y="24" font-family="'Poppins', sans-serif" font-size="28" font-weight="900" fill="#FAF7F2" text-anchor="middle" letter-spacing="4">SIMRU</text>
+        </g>
+    </g>
+</svg>
