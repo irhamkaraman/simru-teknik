@@ -12,7 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Trust all reverse proxies so Laravel correctly reads X-Forwarded-Proto headers.
+        // This fixes Mixed Content errors on HTTPS production deployments (shared hosting / cPanel).
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
