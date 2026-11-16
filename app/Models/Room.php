@@ -32,6 +32,11 @@ class Room extends Model
         return $this->hasMany(Booking::class);
     }
 
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
     public function scopeAvailable(Builder $query): Builder
     {
         return $query->where('status', 'available');

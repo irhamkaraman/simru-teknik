@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Booking;
 use App\Models\BookingLog;
 use App\Models\Room;
+use App\Models\Schedule;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -22,6 +23,24 @@ class BookingService
         $end = Carbon::parse($endTime);
 
         if ($end->lessThanOrEqualTo($start)) {
+            return false;
+        }
+
+        // Cek bentrok dengan Jadwal Kuliah Mingguan Rutin
+        $dayOfWeekIso = $start->dayOfWeekIso;
+        $startTimeStr = $start->format('H:i:s');
+        $endTimeStr = $end->format('H:i:s');
+
+        $hasScheduleConflict = Schedule::where('room_id', $roomId)
+            ->where('status', 'active')
+            ->where('day_of_week', $dayOfWeekIso)
+            ->where(function ($q) use ($startTimeStr, $endTimeStr) {
+                $q->where('start_time', '<', $endTimeStr)
+                    ->where('end_time', '>', $startTimeStr);
+            })
+            ->exists();
+
+        if ($hasScheduleConflict) {
             return false;
         }
 

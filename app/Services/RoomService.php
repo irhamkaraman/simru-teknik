@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\Schedule;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -33,11 +34,39 @@ class RoomService
                 'label' => 'Sedang Pemeliharaan',
                 'badge_color' => 'red',
                 'booking' => null,
+                'schedule' => null,
+                'activity_name' => null,
+                'pic_name' => null,
+                'time_range' => null,
             ];
         }
 
         $now = Carbon::now();
+        $currentDayIso = $now->dayOfWeekIso; // 1 (Senin) .. 7 (Minggu)
+        $currentTime = $now->format('H:i:s');
 
+        // 1. Cek apakah ada JADWAL KULIAH RUTIN yang sedang berlangsung saat ini
+        $currentSchedule = Schedule::where('room_id', $room->id)
+            ->where('status', 'active')
+            ->where('day_of_week', $currentDayIso)
+            ->where('start_time', '<=', $currentTime)
+            ->where('end_time', '>', $currentTime)
+            ->first();
+
+        if ($currentSchedule) {
+            return [
+                'state' => 'occupied',
+                'label' => 'Terpakai (Sedang Digunakan)',
+                'badge_color' => 'red',
+                'booking' => null,
+                'schedule' => $currentSchedule,
+                'activity_name' => $currentSchedule->title,
+                'pic_name' => $currentSchedule->lecturer_name,
+                'time_range' => $currentSchedule->formatted_time,
+            ];
+        }
+
+        // 2. Cek apakah ada BOOKING RUANGAN yang sedang berlangsung saat ini
         $currentBooking = Booking::where('room_id', $room->id)
             ->whereIn('status', ['confirmed', 'checked_in'])
             ->where('start_time', '<=', $now)
@@ -45,14 +74,45 @@ class RoomService
             ->first();
 
         if ($currentBooking) {
+            $startTime = Carbon::parse($currentBooking->start_time)->format('H:i');
+            $endTime = Carbon::parse($currentBooking->end_time)->format('H:i');
+
             return [
                 'state' => 'occupied',
                 'label' => 'Terpakai (Sedang Digunakan)',
                 'badge_color' => 'red',
                 'booking' => $currentBooking,
+                'schedule' => null,
+                'activity_name' => $currentBooking->title,
+                'pic_name' => $currentBooking->borrower_name,
+                'time_range' => "{$startTime} - {$endTime} WIB",
             ];
         }
 
+        // 3. Cek apakah ada JADWAL KULIAH yang akan mulai dalam 60 menit ke depan
+        $soonTime = $now->copy()->addMinutes(60)->format('H:i:s');
+        $upcomingSchedule = Schedule::where('room_id', $room->id)
+            ->where('status', 'active')
+            ->where('day_of_week', $currentDayIso)
+            ->where('start_time', '>', $currentTime)
+            ->where('start_time', '<=', $soonTime)
+            ->orderBy('start_time')
+            ->first();
+
+        if ($upcomingSchedule) {
+            return [
+                'state' => 'soon',
+                'label' => 'Akan Digunakan Segera',
+                'badge_color' => 'yellow',
+                'booking' => null,
+                'schedule' => $upcomingSchedule,
+                'activity_name' => $upcomingSchedule->title,
+                'pic_name' => $upcomingSchedule->lecturer_name,
+                'time_range' => $upcomingSchedule->formatted_time,
+            ];
+        }
+
+        // 4. Cek apakah ada BOOKING yang akan mulai dalam 60 menit ke depan
         $upcomingBooking = Booking::where('room_id', $room->id)
             ->whereIn('status', ['confirmed', 'checked_in'])
             ->where('start_time', '>', $now)
@@ -61,11 +121,18 @@ class RoomService
             ->first();
 
         if ($upcomingBooking) {
+            $startTime = Carbon::parse($upcomingBooking->start_time)->format('H:i');
+            $endTime = Carbon::parse($upcomingBooking->end_time)->format('H:i');
+
             return [
                 'state' => 'soon',
                 'label' => 'Akan Digunakan Segera',
                 'badge_color' => 'yellow',
                 'booking' => $upcomingBooking,
+                'schedule' => null,
+                'activity_name' => $upcomingBooking->title,
+                'pic_name' => $upcomingBooking->borrower_name,
+                'time_range' => "{$startTime} - {$endTime} WIB",
             ];
         }
 
@@ -74,25 +141,96 @@ class RoomService
             'label' => 'Tersedia',
             'badge_color' => 'green',
             'booking' => null,
+            'schedule' => null,
+            'activity_name' => null,
+            'pic_name' => null,
+            'time_range' => null,
         ];
     }
 
-    public function getTodaySchedule(Room $room): Collection
+    public function getTodaySchedule(Room $room): array
     {
-        $todayStart = Carbon::today()->startOfDay();
-        $todayEnd = Carbon::today()->endOfDay();
+        $now = Carbon::now();
+        $currentDayIso = $now->dayOfWeekIso;
+        $items = [];
 
-        return Booking::where('room_id', $room->id)
+        // 1. Jadwal Kuliah Hari Ini
+        $schedules = Schedule::where('room_id', $room->id)
+            ->where('status', 'active')
+            ->where('day_of_week', $currentDayIso)
+            ->get();
+
+        foreach ($schedules as $schedule) {
+            $startStr = substr((string) $schedule->start_time, 0, 5);
+            $endStr = substr((string) $schedule->end_time, 0, 5);
+            $isOngoing = $schedule->isOngoingNow();
+
+            $items[] = [
+                'type' => 'schedule',
+                'title' => $schedule->title,
+                'pic' => $schedule->lecturer_name.($schedule->lecturer_code ? ' ('.$schedule->lecturer_code.')' : ''),
+                'time_start' => $startStr,
+                'time_end' => $endStr,
+                'time_range' => "{$startStr} - {$endStr} WIB",
+                'is_ongoing' => $isOngoing,
+                'badge_label' => $isOngoing ? 'Sedang Digunakan (Kuliah)' : 'Jadwal Kuliah',
+                'badge_color' => $isOngoing ? 'red' : 'blue',
+                'notes' => $schedule->purpose,
+                'sort_key' => $startStr,
+            ];
+        }
+
+        // 2. Booking Khusus Hari Ini
+        $bookings = Booking::where('room_id', $room->id)
             ->whereIn('status', ['confirmed', 'checked_in', 'completed'])
-            ->where(function ($q) use ($todayStart, $todayEnd) {
-                $q->whereBetween('start_time', [$todayStart, $todayEnd])
-                    ->orWhere(function ($inner) use ($todayStart) {
-                        $inner->where('start_time', '<=', $todayStart)
-                            ->where('end_time', '>=', $todayStart);
-                    });
-            })
+            ->whereDate('start_time', Carbon::today())
+            ->with('user')
+            ->get();
+
+        foreach ($bookings as $booking) {
+            $start = Carbon::parse($booking->start_time);
+            $end = Carbon::parse($booking->end_time);
+            $startStr = $start->format('H:i');
+            $endStr = $end->format('H:i');
+            $isOngoing = $now->between($booking->start_time, $booking->end_time);
+
+            $items[] = [
+                'type' => 'booking',
+                'title' => $booking->title,
+                'pic' => $booking->borrower_name.($booking->user ? ' ('.($booking->user->department ?? 'Mahasiswa').')' : ''),
+                'time_start' => $startStr,
+                'time_end' => $endStr,
+                'time_range' => "{$startStr} - {$endStr} WIB",
+                'is_ongoing' => $isOngoing,
+                'badge_label' => $isOngoing ? 'Sedang Digunakan (Reservasi)' : ($booking->status === 'checked_in' ? 'Aktif (Checked In)' : 'Reservasi Khusus'),
+                'badge_color' => $isOngoing ? 'red' : 'emerald',
+                'notes' => $booking->purpose,
+                'sort_key' => $startStr,
+            ];
+        }
+
+        usort($items, fn ($a, $b) => strcmp($a['sort_key'], $b['sort_key']));
+
+        return $items;
+    }
+
+    public function getWeeklySchedules(Room $room): array
+    {
+        $schedules = Schedule::where('room_id', $room->id)
+            ->where('status', 'active')
+            ->orderBy('day_of_week')
             ->orderBy('start_time')
             ->get();
+
+        $grouped = [];
+        foreach (Schedule::DAYS as $dayIndex => $dayName) {
+            $grouped[$dayIndex] = [
+                'day_name' => $dayName,
+                'schedules' => $schedules->where('day_of_week', $dayIndex)->values(),
+            ];
+        }
+
+        return $grouped;
     }
 
     public function getUpcomingSchedule(Room $room, int $days = 7): Collection

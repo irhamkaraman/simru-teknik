@@ -167,6 +167,26 @@
                             {{ $room->description }}
                         </p>
 
+                        @if($status['state'] === 'occupied' && !empty($status['activity_name']))
+                            <div class="mb-5 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs font-heading">
+                                <div class="flex items-center space-x-1.5 text-red-700 font-bold mb-0.5">
+                                    <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+                                    <span>Sedang Berlangsung:</span>
+                                </div>
+                                <p class="font-bold text-[#271A15] truncate">{{ $status['activity_name'] }}</p>
+                                <p class="text-[11px] text-[#3C2A21]/70 truncate">{{ $status['pic_name'] }} &bull; {{ $status['time_range'] }}</p>
+                            </div>
+                        @elseif($status['state'] === 'soon' && !empty($status['activity_name']))
+                            <div class="mb-5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs font-heading">
+                                <div class="flex items-center space-x-1.5 text-amber-800 font-bold mb-0.5">
+                                    <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                                    <span>Akan Dipakai Segera:</span>
+                                </div>
+                                <p class="font-bold text-[#271A15] truncate">{{ $status['activity_name'] }}</p>
+                                <p class="text-[11px] text-[#3C2A21]/70 truncate">{{ $status['pic_name'] }} &bull; {{ $status['time_range'] }}</p>
+                            </div>
+                        @endif
+
                         <div class="pt-4 border-t border-[#3C2A21]/5 mb-6">
                             <div class="flex items-center justify-between font-heading text-xs font-semibold text-[#3C2A21]/70 mb-3">
                                 <span>Kapasitas</span>

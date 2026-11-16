@@ -3,6 +3,7 @@
 use App\Livewire\RoomBrowser;
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\Schedule;
 use App\Models\User;
 use App\Services\BookingService;
 use App\Services\QrCodeService;
@@ -137,6 +138,77 @@ test('room service automatically marks room as occupied when current time falls 
 
     expect($status['state'])->toBe('occupied')
         ->and($status['label'])->toBe('Terpakai (Sedang Digunakan)');
+});
+
+test('room service marks room as occupied when current time falls within recurring weekly schedule', function () {
+    $room = Room::create([
+        'name' => 'Lab Mikrokontroler',
+        'code' => 'LAB-MKR-01',
+        'slug' => 'lab-mikrokontroler',
+        'capacity' => 25,
+        'location' => 'Lt. 2',
+        'status' => 'available',
+        'qr_identifier' => 'lab-mkr-qr',
+    ]);
+
+    $now = Carbon::now();
+    $currentDayIso = $now->dayOfWeekIso;
+
+    Schedule::create([
+        'room_id' => $room->id,
+        'day_of_week' => $currentDayIso,
+        'start_time' => $now->copy()->subMinutes(20)->format('H:i:s'),
+        'end_time' => $now->copy()->addMinutes(40)->format('H:i:s'),
+        'title' => 'Praktikum Arsitektur Komputer',
+        'lecturer_name' => 'Dr. Ir. Budi Raharjo',
+        'status' => 'active',
+    ]);
+
+    $roomService = app(RoomService::class);
+    $status = $roomService->getRoomCurrentStatus($room);
+
+    expect($status['state'])->toBe('occupied')
+        ->and($status['label'])->toBe('Terpakai (Sedang Digunakan)')
+        ->and($status['activity_name'])->toBe('Praktikum Arsitektur Komputer');
+});
+
+test('booking service prevents booking when slot overlaps with weekly recurring schedule', function () {
+    $room = Room::create([
+        'name' => 'Lab Sistem Cerdas',
+        'code' => 'LAB-SC-01',
+        'slug' => 'lab-sistem-cerdas',
+        'capacity' => 30,
+        'location' => 'Lt. 3',
+        'status' => 'available',
+        'qr_identifier' => 'lab-sc-qr',
+    ]);
+
+    $now = Carbon::now();
+    $dayIso = $now->dayOfWeekIso;
+
+    Schedule::create([
+        'room_id' => $room->id,
+        'day_of_week' => $dayIso,
+        'start_time' => '13:00:00',
+        'end_time' => '16:00:00',
+        'title' => 'Kuliah Machine Learning',
+        'lecturer_name' => 'Prof. Dosen',
+        'status' => 'active',
+    ]);
+
+    $bookingService = app(BookingService::class);
+
+    // Coba booking pada hari ini jam 14:00 - 15:00 (bentrok)
+    $startConflict = $now->copy()->setTime(14, 0);
+    $endConflict = $now->copy()->setTime(15, 0);
+
+    expect($bookingService->isSlotAvailable($room->id, $startConflict, $endConflict))->toBeFalse();
+
+    // Coba booking pada jam yang tidak bentrok (17:00 - 18:00)
+    $startOk = $now->copy()->setTime(17, 0);
+    $endOk = $now->copy()->setTime(18, 0);
+
+    expect($bookingService->isSlotAvailable($room->id, $startOk, $endOk))->toBeTrue();
 });
 
 test('root route redirects to rooms index', function () {

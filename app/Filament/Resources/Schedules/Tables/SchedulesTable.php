@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Schedules\Tables;
 
+use App\Models\Schedule;
 use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -22,49 +23,83 @@ class SchedulesTable
                     ->weight('bold')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('day_of_week')
+                    ->label('Hari')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => Schedule::DAYS[(int) $state] ?? '-')
+                    ->colors([
+                        'primary' => fn ($state) => in_array((int) $state, [1, 2, 3, 4, 5]),
+                        'warning' => fn ($state) => in_array((int) $state, [6, 7]),
+                    ])
+                    ->sortable(),
+                TextColumn::make('start_time')
+                    ->label('Jam Kuliah')
+                    ->formatStateUsing(fn ($record) => $record->formatted_time)
+                    ->sortable(),
                 TextColumn::make('title')
                     ->label('Mata Kuliah / Kegiatan')
                     ->weight('bold')
                     ->searchable(),
-                TextColumn::make('borrower_name')
+                TextColumn::make('lecturer_name')
                     ->label('Dosen Pengampu / PIC')
                     ->searchable(),
-                TextColumn::make('start_time')
-                    ->label('Waktu Mulai')
-                    ->dateTime('d M Y, H:i')
-                    ->sortable(),
-                TextColumn::make('end_time')
-                    ->label('Waktu Selesai')
-                    ->dateTime('H:i')
-                    ->sortable(),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state === 'active' ? 'Aktif' : 'Nonaktif')
+                    ->colors([
+                        'success' => 'active',
+                        'gray' => 'inactive',
+                    ]),
                 TextColumn::make('realtime_status')
                     ->label('Kondisi Real-Time')
-                    ->state(function ($record) {
-                        $now = Carbon::now();
-                        if ($record->status === 'cancelled') {
-                            return 'Dibatalkan';
-                        }
-                        if ($now->between($record->start_time, $record->end_time)) {
-                            return 'Terpakai Saat Ini';
-                        }
-                        if ($now->lt($record->start_time)) {
-                            return 'Akan Datang';
+                    ->state(function (Schedule $record) {
+                        if ($record->status !== 'active') {
+                            return 'Nonaktif';
                         }
 
-                        return 'Selesai';
+                        $now = Carbon::now();
+                        $currentDayIso = $now->dayOfWeekIso;
+
+                        if ($currentDayIso !== (int) $record->day_of_week) {
+                            return 'Jadwal '.($record->day_name);
+                        }
+
+                        $currentTime = $now->format('H:i:s');
+                        $startTime = Carbon::parse($record->start_time)->format('H:i:s');
+                        $endTime = Carbon::parse($record->end_time)->format('H:i:s');
+
+                        if ($currentTime >= $startTime && $currentTime < $endTime) {
+                            return 'Terpakai Saat Ini';
+                        }
+
+                        if ($currentTime < $startTime) {
+                            return 'Hari Ini (Akan Datang)';
+                        }
+
+                        return 'Hari Ini (Selesai)';
                     })
                     ->badge()
                     ->colors([
                         'danger' => 'Terpakai Saat Ini',
-                        'info' => 'Akan Datang',
-                        'gray' => 'Selesai',
-                        'warning' => 'Dibatalkan',
+                        'info' => 'Hari Ini (Akan Datang)',
+                        'gray' => fn ($state) => in_array($state, ['Hari Ini (Selesai)', 'Nonaktif']) || str_starts_with((string) $state, 'Jadwal '),
                     ]),
             ])
+            ->defaultSort('day_of_week')
             ->filters([
+                SelectFilter::make('day_of_week')
+                    ->label('Filter Hari')
+                    ->options(Schedule::DAYS),
                 SelectFilter::make('room_id')
                     ->label('Filter Ruangan')
                     ->relationship('room', 'name'),
+                SelectFilter::make('status')
+                    ->label('Filter Status')
+                    ->options([
+                        'active' => 'Aktif',
+                        'inactive' => 'Nonaktif',
+                    ]),
             ])
             ->recordActions([
                 Action::make('buka_web')

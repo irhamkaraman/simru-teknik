@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Booking;
 use App\Models\BookingLog;
 use App\Models\Room;
+use App\Models\Schedule;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -136,6 +137,101 @@ class DatabaseSeeder extends Seeder
                     ]
                 );
             }
+        }
+
+        // Seed Jadwal Kuliah & Praktikum Rutin Mingguan
+        $iotRoom = Room::where('code', 'LAB-IOT-01')->first();
+        if ($iotRoom) {
+            Schedule::firstOrCreate(
+                [
+                    'room_id' => $iotRoom->id,
+                    'day_of_week' => 1, // Senin
+                    'start_time' => '08:00:00',
+                ],
+                [
+                    'end_time' => '10:30:00',
+                    'title' => 'Pemrograman Sistem Tertanam (Kelas A)',
+                    'lecturer_name' => 'Dr. Ir. Budi Raharjo, M.T.',
+                    'lecturer_code' => 'NIP. 197805122005011002',
+                    'phone' => '081234567890',
+                    'status' => 'active',
+                    'purpose' => 'Praktikum pemrograman mikrokontroler STM32 dan FreeRTOS.',
+                ]
+            );
+
+            Schedule::firstOrCreate(
+                [
+                    'room_id' => $iotRoom->id,
+                    'day_of_week' => 3, // Rabu
+                    'start_time' => '13:00:00',
+                ],
+                [
+                    'end_time' => '15:30:00',
+                    'title' => 'Robotika Industri & Kendali Cerdas',
+                    'lecturer_name' => 'Dr. Ir. Budi Raharjo, M.T.',
+                    'lecturer_code' => 'NIP. 197805122005011002',
+                    'phone' => '081234567890',
+                    'status' => 'active',
+                    'purpose' => 'Implementasi Inverse Kinematics dan penglihatan komputer pada Robot Arm.',
+                ]
+            );
+        }
+
+        $netRoom = Room::where('code', 'LAB-NET-02')->first();
+        if ($netRoom) {
+            Schedule::firstOrCreate(
+                [
+                    'room_id' => $netRoom->id,
+                    'day_of_week' => 2, // Selasa
+                    'start_time' => '08:30:00',
+                ],
+                [
+                    'end_time' => '11:00:00',
+                    'title' => 'Infrastruktur Cloud & Jaringan Enterprise',
+                    'lecturer_name' => 'Hendra Kusuma, M.Kom.',
+                    'lecturer_code' => 'NIP. 198503202010121004',
+                    'phone' => '081234567891',
+                    'status' => 'active',
+                    'purpose' => 'Konfigurasi routing BGP enterprise dan cluster Kubernetes.',
+                ]
+            );
+
+            Schedule::firstOrCreate(
+                [
+                    'room_id' => $netRoom->id,
+                    'day_of_week' => 4, // Kamis
+                    'start_time' => '10:00:00',
+                ],
+                [
+                    'end_time' => '12:30:00',
+                    'title' => 'Ethical Hacking & Keamanan Siber Lanjut',
+                    'lecturer_name' => 'Hendra Kusuma, M.Kom.',
+                    'lecturer_code' => 'NIP. 198503202010121004',
+                    'phone' => '081234567891',
+                    'status' => 'active',
+                    'purpose' => 'Simulasi penetration testing dan audit keamanan server web.',
+                ]
+            );
+        }
+
+        $cadRoom = Room::where('code', 'STD-CAD-01')->first();
+        if ($cadRoom) {
+            Schedule::firstOrCreate(
+                [
+                    'room_id' => $cadRoom->id,
+                    'day_of_week' => 5, // Jumat
+                    'start_time' => '08:00:00',
+                ],
+                [
+                    'end_time' => '10:30:00',
+                    'title' => 'Pemodelan CAD 3D & Analisis Elemen Hingga (FEA)',
+                    'lecturer_name' => 'Ir. Agung Prabowo, M.T.',
+                    'lecturer_code' => 'NIP. 198109152008121001',
+                    'phone' => '081234567893',
+                    'status' => 'active',
+                    'purpose' => 'Simulasi tegangan mekanikal dan perancangan poros transmisi daya.',
+                ]
+            );
         }
     }
 }

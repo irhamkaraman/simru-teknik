@@ -20,6 +20,7 @@ class RoomDetail extends Component
     {
         $currentStatus = $roomService->getRoomCurrentStatus($this->room);
         $todaySchedule = $roomService->getTodaySchedule($this->room);
+        $weeklySchedules = $roomService->getWeeklySchedules($this->room);
         $upcomingSchedule = $roomService->getUpcomingSchedule($this->room);
 
         $doorQrUrl = $qrService->generateRoomPayload($this->room);
@@ -28,6 +29,7 @@ class RoomDetail extends Component
         return view('livewire.room-detail', [
             'currentStatus' => $currentStatus,
             'todaySchedule' => $todaySchedule,
+            'weeklySchedules' => $weeklySchedules,
             'upcomingSchedule' => $upcomingSchedule,
             'doorQrSvg' => $doorQrSvg,
             'doorQrUrl' => $doorQrUrl,
