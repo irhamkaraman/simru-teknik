@@ -78,7 +78,7 @@ class Schedule extends Model
             return false;
         }
 
-        $now = Carbon::now();
+        $now = Carbon::now(config('app.timezone', 'Asia/Jakarta'));
         if ($now->dayOfWeekIso !== (int) $this->day_of_week) {
             return false;
         }

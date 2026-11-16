@@ -114,7 +114,7 @@
                 <div class="flex items-center justify-between mb-8 pb-4 border-b border-[#3C2A21]/10">
                     <div>
                         <h3 class="font-heading text-2xl font-bold text-[#271A15] tracking-tight">Jadwal Penggunaan Hari Ini</h3>
-                        <p class="font-body text-xs text-[#3C2A21]/70 mt-1">{{ \Carbon\Carbon::today()->translatedFormat('l, d F Y') }}</p>
+                        <p class="font-body text-xs text-[#3C2A21]/70 mt-1">{{ \Carbon\Carbon::now(config('app.timezone', 'Asia/Jakarta'))->translatedFormat('l, d F Y') }}</p>
                     </div>
                 </div>
 

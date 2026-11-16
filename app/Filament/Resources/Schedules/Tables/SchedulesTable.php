@@ -58,7 +58,7 @@ class SchedulesTable
                             return 'Nonaktif';
                         }
 
-                        $now = Carbon::now();
+                        $now = Carbon::now(config('app.timezone', 'Asia/Jakarta'));
                         $currentDayIso = $now->dayOfWeekIso;
 
                         if ($currentDayIso !== (int) $record->day_of_week) {

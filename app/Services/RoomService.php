@@ -41,7 +41,7 @@ class RoomService
             ];
         }
 
-        $now = Carbon::now();
+        $now = $this->getNow();
         $currentDayIso = $now->dayOfWeekIso; // 1 (Senin) .. 7 (Minggu)
         $currentTime = $now->format('H:i:s');
 
@@ -150,7 +150,7 @@ class RoomService
 
     public function getTodaySchedule(Room $room): array
     {
-        $now = Carbon::now();
+        $now = $this->getNow();
         $currentDayIso = $now->dayOfWeekIso;
         $items = [];
 
@@ -235,8 +235,8 @@ class RoomService
 
     public function getUpcomingSchedule(Room $room, int $days = 7): Collection
     {
-        $start = Carbon::now();
-        $end = Carbon::now()->addDays($days)->endOfDay();
+        $start = $this->getNow();
+        $end = $this->getNow()->addDays($days)->endOfDay();
 
         return Booking::where('room_id', $room->id)
             ->whereIn('status', ['confirmed', 'checked_in'])
@@ -244,5 +244,10 @@ class RoomService
             ->where('start_time', '<=', $end)
             ->orderBy('start_time')
             ->get();
+    }
+
+    public function getNow(): Carbon
+    {
+        return Carbon::now(config('app.timezone', 'Asia/Jakarta'));
     }
 }
